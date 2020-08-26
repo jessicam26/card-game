@@ -1,0 +1,207 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Random;
+
+//classes
+public class CardGame extends JFrame
+        implements ActionListener {
+    
+    public static final int WIDTH = 700;
+    public static final int HEIGHT = 650;
+    
+    private JButton stopButton;
+    private JButton newCardButton;
+    private JButton newHandButton;
+    
+    private JLabel totalPointsLabel;
+    private JLabel replaceLabel;
+    
+    private ImageIcon cardImage[];
+    
+    private JButton cardButton[];
+    
+    private JLabel newCardLabel;
+    private JLabel scoreLabel;
+    private JLabel parScoreLabel;
+    
+    private int cardValues[];
+    private int newCardValue;
+    private int currentScore;
+    private int parScore;
+    
+    
+    private Random generator;
+    
+    private boolean canChangeCard;
+    private boolean canDoNewHand;
+    
+    
+    
+    
+    /**
+     * Creates a new instance of CardGame
+     */
+    public CardGame() {
+        super();
+        
+        setSize(WIDTH, HEIGHT); 
+        setTitle("Card game"); //title
+        
+        generator = new Random();
+        
+        cardImage = new ImageIcon[11]; //how many images will be stored
+        
+		//card images
+        cardImage[0] = new ImageIcon("CardBack.jpg");
+        cardImage[1] = new ImageIcon("Card1.jpg");
+        cardImage[2] = new ImageIcon("Card2.jpg");
+        cardImage[3] = new ImageIcon("Card3.jpg");
+        cardImage[4] = new ImageIcon("Card4.jpg");
+        cardImage[5] = new ImageIcon("Card5.jpg");
+        cardImage[6] = new ImageIcon("Card6.jpg");
+        cardImage[7] = new ImageIcon("Card7.jpg");
+        cardImage[8] = new ImageIcon("Card8.jpg");
+        cardImage[9] = new ImageIcon("Card9.jpg");
+        cardImage[10] = new ImageIcon("Card10.jpg");
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(2,2, 20, 20));
+        
+        
+        stopButton = new JButton("Stop"); //stop button
+        newCardButton  = new JButton("New Card"); //new card button
+        newHandButton = new JButton("New Hand"); //new hand button
+        
+        stopButton.addActionListener(this); //implementing the listener
+        newCardButton.addActionListener(this);
+        newHandButton.addActionListener(this);
+        
+        newCardLabel = new JLabel(cardImage[0]);
+        newCardLabel.setVisible(false);
+        
+        replaceLabel = new JLabel("");
+        
+		//adding button panel
+        buttonPanel.add(newCardButton);
+        buttonPanel.add(stopButton);
+        buttonPanel.add(newCardLabel);
+        buttonPanel.add(replaceLabel);
+        
+        
+        JPanel cardPanel = new JPanel();
+        cardPanel.setLayout(new GridLayout(1,4, 25, 25));
+        
+        cardButton = new JButton[4]; //allows four cards
+        cardValues = new int[4];
+        for(int i=0; i<4; i++){ //equation for the four cards letting the program know not to go over four
+            cardButton[i] = new JButton(cardImage[0]);
+            cardButton[i].addActionListener(this);
+            cardPanel.add(cardButton[i]);
+        }
+        
+        parScore = 0;
+        parScoreLabel= new JLabel("Par Score is: " + parScore); //prints out text and the score
+        
+        setupNewHand();
+        
+        
+        JPanel displayPanel = new JPanel();
+        displayPanel.setLayout(new GridLayout(2,2,20, 0));
+        currentScore = 0;
+        scoreLabel = new JLabel("Current Score is: " + currentScore); //prints out text and current score
+        displayPanel.add(scoreLabel); //making the display panel
+        displayPanel.add(newHandButton);
+        displayPanel.add(parScoreLabel);
+        
+        canChangeCard = false;
+        canDoNewHand = false;
+        
+        getContentPane().add(buttonPanel, BorderLayout.NORTH);
+        getContentPane().add(cardPanel, BorderLayout.CENTER);
+        getContentPane().add(displayPanel, BorderLayout.SOUTH);
+        
+        
+        
+        //setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        WindowDestroyer listener = new WindowDestroyer();
+        addWindowListener(listener);
+        
+    }
+    //gives you four cards when you choose new hand
+    public void setupNewHand(){
+        for(int i=0; i<4; i++){
+            cardButton[i].setIcon(cardImage[0]);
+            cardValues[i] = generator.nextInt(10)+1;
+            parScore += cardValues[i];
+        }
+        canDoNewHand = false;
+        
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        Double sub;
+        Double cost;
+        //saying if button is clicked give score
+        if (e.getSource()==stopButton) {
+            if(!canDoNewHand){
+                for(int i=0; i<4; i++){
+                    cardButton[i].setIcon(cardImage[cardValues[i]]);
+                    currentScore += cardValues[i];
+                }
+                scoreLabel.setText("Current Score is: " + currentScore);
+                parScoreLabel.setText("Par Score is: " + parScore);
+                canDoNewHand = true;
+            }
+            
+        } else if (e.getSource()==newHandButton) {
+            if(canDoNewHand){
+                setupNewHand();
+                canDoNewHand = false;
+            }
+        } else if (e.getSource()==newCardButton) {
+            newCardValue = generator.nextInt(10)+1;
+            newCardLabel.setIcon(cardImage[newCardValue]);
+            newCardLabel.setVisible(true);
+            canChangeCard = true;
+            currentScore -= 1;
+            scoreLabel.setText("Current Score is: " + currentScore);
+            
+        } else if (e.getSource()==cardButton[0]) {
+            if(canChangeCard){
+                canChangeCard = false;
+                newCardLabel.setVisible(false);
+                replaceLabel.setText("Replaced the value " + cardValues[0] + " by " + newCardValue);
+                cardValues[0] = newCardValue;
+            }
+        } else if (e.getSource()==cardButton[1]) {
+            if(canChangeCard){
+                canChangeCard = false;
+                newCardLabel.setVisible(false);
+                replaceLabel.setText("Replaced the value " + cardValues[1] + " by " + newCardValue);
+                cardValues[1] = newCardValue;
+            }
+        } else if (e.getSource()==cardButton[2]) {
+            if(canChangeCard){
+                canChangeCard = false;
+                newCardLabel.setVisible(false);
+                replaceLabel.setText("Replaced the value " + cardValues[2] + " by " + newCardValue);
+                cardValues[2] = newCardValue;
+            }
+        } else if (e.getSource()==cardButton[3]) {
+            if(canChangeCard){
+                canChangeCard = false;
+                newCardLabel.setVisible(false);
+                replaceLabel.setText("Replaced the value " + cardValues[3] + " by " + newCardValue);
+                cardValues[3] = newCardValue;
+            }
+        } else
+            System.out.println("Error in button interface.");
+        
+    }
+    
+    public static void main(String[] args) {
+        CardGame window1 = new CardGame();
+        window1.setVisible(true);
+    }
+}
